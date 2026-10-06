@@ -4,16 +4,15 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.animation.PathTransition;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.CubicCurveTo;
+import javafx.util.Duration;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Line;
+import javafx.scene.shape.LineTo;
 
 //https://github.com/BoomEAE/Lab07.git
 
@@ -27,32 +26,51 @@ public class App extends Application {
     public void start(Stage mainStage) {
         
         //Pane for layout
-        Pane root = new Pane();
+        BorderPane root = new BorderPane();
+        Pane pane = new Pane();
+        pane.setPrefSize(400, 400);
+        HBox buttonsBox = new HBox();
         
         //Buttons
-        Button start = new Button();
-        Button reset = new Button();
-        Button exit = new Button();
+        Button start = new Button("start");
+        Button reset = new Button("reset");
+        Button exit = new Button("exit");
         
         //Shapes
         Circle objectA = new Circle(20, 20, 20);
         
-        //Lines (the different paths)
-        Line mToN = new Line();
-        Line nToP = new Line();
-        Line pToQ = new Line();
-        Line qToM = new Line();
+        //Paths
+        Path paths = new Path();
+        paths.getElements().addAll(new MoveTo(20, 20), new LineTo(380, 20), new LineTo(380, 380), new LineTo(20, 380), new LineTo(20, 20));
         
         //A PathTransition and its setup
         PathTransition pt = new PathTransition();
+        pt.setNode(objectA);
+        pt.setPath(paths);
+        pt.setDuration(new Duration(3000));
         
         //Add the shape to the root
-        root.getChildren().addAll(objectA);
+        pane.getChildren().add(objectA);
+        buttonsBox.getChildren().addAll(start, reset, exit);
+        root.setCenter(pane);
+        root.setBottom(buttonsBox);
         
         //Scene and stage setup
         Scene scene = new Scene(root, 400, 400);
         mainStage.setScene(scene);
         mainStage.show();
+        
+        //When start button is pressed, start animation
+        start.setOnAction(event -> pt.play());
+        
+        //When reset button is pressed, reset it to duration zero and stop the animation
+        reset.setOnAction(event -> {
+            pt.jumpTo(Duration.ZERO);
+            pt.stop();
+        });
+        
+        //Exit the program
+        exit.setOnAction(event -> System.exit(0));
         
     }
 
